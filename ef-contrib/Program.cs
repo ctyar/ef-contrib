@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Diagnostics;
 
@@ -28,15 +29,23 @@ namespace Ctyar.Ef.Contrib
         {
             const string workingDirectory = @"C:\Shahriar\Projects\whynotearth\meredith-core";
 
-            Remove("ShareImage", workingDirectory);
+            var lastMigration = "NewMigration";
+            var secondToLastMigration = "ShareImage";
+            var beforeSecondToLastMigration = "LandingPageData";
 
-            Remove("LandingPageData", workingDirectory);
+            PrintInfo($"Squashing last two migrations: {lastMigration}, {secondToLastMigration}");
 
-            AddMigration("NewMigration", workingDirectory);
+            Remove(secondToLastMigration, workingDirectory);
+
+            Remove(beforeSecondToLastMigration, workingDirectory);
+
+            AddMigration(lastMigration, workingDirectory);
         }
 
         private static void Remove(string migrationName, string workingDirectory)
         {
+            PrintInfo($"Removing migration: {migrationName}");
+
             UpdateDatabase(migrationName, workingDirectory);
 
             RemoveLastMigration(workingDirectory);
@@ -44,16 +53,22 @@ namespace Ctyar.Ef.Contrib
 
         private static void RemoveLastMigration(string workingDirectory)
         {
+            PrintInfo("Removing last migration");
+
             Execute("ef migrations remove -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App", workingDirectory);
         }
 
         private static void AddMigration(string migrationName, string workingDirectory)
         {
+            PrintInfo($"Adding new migration: {migrationName}");
+
             Execute($"ef migrations add {migrationName} -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App", workingDirectory);
         }
 
         private static void UpdateDatabase(string migrationName, string workingDirectory)
         {
+            PrintInfo($"Updating database to : {migrationName}");
+
             Execute(
                 $"ef database update {migrationName} -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App",
                 workingDirectory);
@@ -74,6 +89,21 @@ namespace Ctyar.Ef.Contrib
 
             process.Start();
             process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                Environment.Exit(process.ExitCode);
+            }
+        }
+
+        private static void PrintInfo(string message)
+        {
+            var previousColor = Console.ForegroundColor;
+            
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(message);
+
+            Console.ForegroundColor = previousColor;
         }
     }
 }

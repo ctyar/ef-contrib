@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -8,9 +9,11 @@ namespace Ctyar.Ef.Contrib
     {
         public void Execute()
         {
-            var lastMigration = "NewMigration";
-            var secondToLastMigration = "ShareImage";
-            var beforeSecondToLastMigration = "LandingPageData";
+            var migrations = GetMigrations();
+
+            var lastMigration = migrations[^1];
+            var secondToLastMigration = migrations[^2];
+            var beforeSecondToLastMigration = migrations[^3];
 
             PrintInfo($"Squashing last two migrations: {lastMigration}, {secondToLastMigration}");
 
@@ -19,6 +22,8 @@ namespace Ctyar.Ef.Contrib
             Remove(beforeSecondToLastMigration);
 
             AddMigration(lastMigration);
+
+            PrintInfo("Done");
         }
 
         private void Remove(string migrationName)
@@ -52,6 +57,18 @@ namespace Ctyar.Ef.Contrib
                 $"ef database update {migrationName} -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App");
         }
 
+        private string[] GetMigrations()
+        {
+            PrintInfo("Getting migrations list");
+
+            var lines = GetCommandResult("ef migrations list -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App");
+            
+            // Skip first two lines:
+            // Build started...
+            // Build succeeded.
+            return lines.ToArray()[2..];
+        }
+
         private void Execute(string command)
         {
             using var process = new Process
@@ -60,7 +77,8 @@ namespace Ctyar.Ef.Contrib
                 {
                     FileName = "dotnet",
                     Arguments = command,
-                    CreateNoWindow = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
                     WorkingDirectory = Directory.GetCurrentDirectory()
                 }
             };
@@ -70,8 +88,48 @@ namespace Ctyar.Ef.Contrib
 
             if (process.ExitCode != 0)
             {
+                PrintError(process.StandardOutput.ReadToEnd());
+
                 Environment.Exit(process.ExitCode);
             }
+        }
+
+        private List<string> GetCommandResult(string command)
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "dotnet",
+                    Arguments = command,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = Directory.GetCurrentDirectory()
+                }
+            };
+
+            process.Start();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                PrintError(process.StandardOutput.ReadToEnd());
+
+                Environment.Exit(process.ExitCode);
+            }
+
+            var result = new List<string>();
+            while (!process.StandardOutput.EndOfStream)
+            {
+                var line = process.StandardOutput.ReadLine();
+
+                if (line != null)
+                {
+                    result.Add(line);
+                }
+            }
+
+            return result;
         }
 
         private void PrintInfo(string message)
@@ -79,6 +137,16 @@ namespace Ctyar.Ef.Contrib
             var previousColor = Console.ForegroundColor;
             
             Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(message);
+
+            Console.ForegroundColor = previousColor;
+        }
+
+        private void PrintError(string message)
+        {
+            var previousColor = Console.ForegroundColor;
+            
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
 
             Console.ForegroundColor = previousColor;

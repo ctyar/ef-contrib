@@ -7,18 +7,16 @@ namespace Ctyar.Ef.Contrib
     {
         private static int Main(string[] args)
         {
-            var rootCommand = new RootCommand
-            {
-                Handler = CommandHandler.Create(Squash)
-            };
+            var rootCommand = new RootCommand();
 
-            /*var squashCommand = new Command("--squash")
+            var squashCommand = new Command("--squash")
             {
-                Handler = CommandHandler.Create(Squash)
+                Handler = CommandHandler.Create(Squash),
+                Description = "Merges last two migrations"
             };
             squashCommand.AddAlias("-s");
 
-            rootCommand.Add(squashCommand);*/
+            rootCommand.Add(squashCommand);
 
             return rootCommand.Invoke(args);
         }

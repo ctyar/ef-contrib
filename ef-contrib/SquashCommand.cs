@@ -7,28 +7,35 @@ namespace Ctyar.Ef.Contrib
 {
     internal class SquashCommand
     {
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+        private Config _config;
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
         public void Execute()
         {
+            var configCommand = new ConfigCommand();
+            _config = configCommand.ReadConfigFile();
+
             var migrations = GetMigrations();
 
             var lastMigration = migrations[^1];
             var secondToLastMigration = migrations[^2];
-            var beforeSecondToLastMigration = migrations[^3];
+            var thirdToLastMigration = migrations[^3];
 
-            PrintInfo($"Squashing last two migrations: {lastMigration}, {secondToLastMigration}");
+            Print.Info($"Squashing last two migrations: {lastMigration}, {secondToLastMigration}");
 
             Remove(secondToLastMigration);
 
-            Remove(beforeSecondToLastMigration);
+            Remove(thirdToLastMigration);
 
             AddMigration(lastMigration);
 
-            PrintInfo("Done");
+            Print.Info("Done");
         }
 
         private void Remove(string migrationName)
         {
-            PrintInfo($"Removing migration: {migrationName}");
+            Print.Info($"Removing migration: {migrationName}");
 
             UpdateDatabase(migrationName);
 
@@ -37,31 +44,31 @@ namespace Ctyar.Ef.Contrib
 
         private void RemoveLastMigration()
         {
-            PrintInfo("Removing last migration");
+            Print.Info("Removing last migration");
 
-            Execute("ef migrations remove -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App");
+            Execute("ef migrations remove");
         }
 
         private void AddMigration(string migrationName)
         {
-            PrintInfo($"Adding new migration: {migrationName}");
+            Print.Info($"Adding new migration: {migrationName}");
 
-            Execute($"ef migrations add {migrationName} -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App");
+            Execute($"ef migrations add {migrationName}");
         }
 
         private void UpdateDatabase(string migrationName)
         {
-            PrintInfo($"Updating database to : {migrationName}");
+            Print.Info($"Updating database to : {migrationName}");
 
             Execute(
-                $"ef database update {migrationName} -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App");
+                $"ef database update {migrationName}");
         }
 
         private string[] GetMigrations()
         {
-            PrintInfo("Getting migrations list");
+            Print.Info("Getting migrations list");
 
-            var lines = GetCommandResult("ef migrations list -p WhyNotEarth.Meredith.Data.Entity -s WhyNotEarth.Meredith.App");
+            var lines = GetCommandResult("ef migrations list");
             
             // Skip first two lines:
             // Build started...
@@ -76,7 +83,7 @@ namespace Ctyar.Ef.Contrib
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    Arguments = command,
+                    Arguments = command + _config.ToString(),
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
                     WorkingDirectory = Directory.GetCurrentDirectory()
@@ -88,7 +95,7 @@ namespace Ctyar.Ef.Contrib
 
             if (process.ExitCode != 0)
             {
-                PrintError(process.StandardOutput.ReadToEnd());
+                Print.Error(process.StandardOutput.ReadToEnd());
 
                 Environment.Exit(process.ExitCode);
             }
@@ -101,7 +108,7 @@ namespace Ctyar.Ef.Contrib
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    Arguments = command,
+                    Arguments = command + _config.ToString(),
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
                     WorkingDirectory = Directory.GetCurrentDirectory()
@@ -113,7 +120,7 @@ namespace Ctyar.Ef.Contrib
 
             if (process.ExitCode != 0)
             {
-                PrintError(process.StandardOutput.ReadToEnd());
+                Print.Error(process.StandardOutput.ReadToEnd());
 
                 Environment.Exit(process.ExitCode);
             }
@@ -130,26 +137,6 @@ namespace Ctyar.Ef.Contrib
             }
 
             return result;
-        }
-
-        private void PrintInfo(string message)
-        {
-            var previousColor = Console.ForegroundColor;
-            
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(message);
-
-            Console.ForegroundColor = previousColor;
-        }
-
-        private void PrintError(string message)
-        {
-            var previousColor = Console.ForegroundColor;
-            
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-
-            Console.ForegroundColor = previousColor;
         }
     }
 }

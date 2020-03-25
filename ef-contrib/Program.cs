@@ -5,7 +5,7 @@ namespace Ctyar.Ef.Contrib
 {
     internal class Program
     {
-        private static int Main(string[] args)
+        public static int Main(string[] args)
         {
             var rootCommand = new RootCommand();
 
@@ -16,7 +16,15 @@ namespace Ctyar.Ef.Contrib
             };
             squashCommand.AddAlias("-s");
 
+            var configCommand = new Command("--config")
+            {
+                Handler = CommandHandler.Create(Config),
+                Description = "Adds a config file with default project info"
+            };
+            configCommand.AddAlias("-c");
+
             rootCommand.Add(squashCommand);
+            rootCommand.Add(configCommand);
 
             return rootCommand.Invoke(args);
         }
@@ -26,6 +34,13 @@ namespace Ctyar.Ef.Contrib
             var squashCommand = new SquashCommand();
 
             squashCommand.Execute();
+        }
+
+        private static void Config()
+        {
+            var configCommand = new ConfigCommand();
+
+            configCommand.Execute();
         }
     }
 }

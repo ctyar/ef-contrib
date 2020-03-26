@@ -1,15 +1,12 @@
 ﻿namespace Ctyar.Ef.Contrib
 {
-    internal class SquashCommand : CommandBase
+    internal class RecreateCommand : CommandBase
     {
         public void Execute()
         {
             var lastMigration = Migrations[^1];
-            var secondToLastMigration = Migrations[^2];
 
-            Print.Info($"Squashing last two migrations: {lastMigration}, {secondToLastMigration}");
-
-            Remove();
+            Print.Info("Recreating the last migration");
 
             Remove();
 

@@ -7,22 +7,6 @@ namespace Ctyar.Ef.Contrib
     {
         public static int Main(string[] args)
         {
-            var rootCommand = new RootCommand();
-
-            var squashCommand = new Command("--squash")
-            {
-                Handler = CommandHandler.Create(Squash),
-                Description = "Merges last two migrations"
-            };
-            squashCommand.AddAlias("-s");
-
-            var configCommand = new Command("--config")
-            {
-                Handler = CommandHandler.Create(Config),
-                Description = "Adds a config file with default project info"
-            };
-            configCommand.AddAlias("-c");
-
             if (args[0].ToLower() == "ef")
             {
                 Ef(args);
@@ -30,10 +14,38 @@ namespace Ctyar.Ef.Contrib
                 return 0;
             }
 
+            var rootCommand = new RootCommand();
+
+            var recreateCommand = new Command("recreate")
+            {
+                Handler = CommandHandler.Create(Recreate),
+                Description = "Recreates the last migration"
+            };
+
+            var squashCommand = new Command("squash")
+            {
+                Handler = CommandHandler.Create(Squash),
+                Description = "Merges last two migrations"
+            };
+
+            var configCommand = new Command("config")
+            {
+                Handler = CommandHandler.Create(Config),
+                Description = "Adds a config file with default project info"
+            };
+            
+            rootCommand.Add(recreateCommand);
             rootCommand.Add(squashCommand);
             rootCommand.Add(configCommand);
 
             return rootCommand.Invoke(args);
+        }
+
+        private static void Recreate()
+        {
+            var recreateCommand = new RecreateCommand();
+
+            recreateCommand.Execute();
         }
 
         private static void Squash()

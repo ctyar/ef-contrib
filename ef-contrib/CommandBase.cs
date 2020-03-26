@@ -68,8 +68,6 @@ namespace Ctyar.Ef.Contrib
 
         private List<string> GetMigrations()
         {
-            Print.Info("Getting migrations list");
-
             var lines = GetProcessResult("ef migrations list");
             
             // Skip first two lines:

@@ -7,7 +7,7 @@ namespace Ctyar.Ef.Contrib
     {
         public static int Main(string[] args)
         {
-            if (args[0].ToLower() == "ef")
+            if (args.Length > 1 && args[0].ToLower() == "ef")
             {
                 Ef(args);
 
@@ -28,6 +28,24 @@ namespace Ctyar.Ef.Contrib
                 Description = "Merges last two migrations"
             };
 
+            var addCommand = new Command("add")
+            {
+                Handler = CommandHandler.Create<string>(Add),
+                Description = "Adds a new migration"
+            };
+            var argument = new Argument("migrationName")
+            {
+                Arity = ArgumentArity.ExactlyOne,
+                Description = "Migration name to add"
+            };
+            addCommand.AddArgument(argument);
+
+            var removeCommand = new Command("remove")
+            {
+                Handler = CommandHandler.Create(Remove),
+                Description = "Removes the last migration"
+            };
+
             var configCommand = new Command("config")
             {
                 Handler = CommandHandler.Create(Config),
@@ -36,6 +54,8 @@ namespace Ctyar.Ef.Contrib
             
             rootCommand.Add(recreateCommand);
             rootCommand.Add(squashCommand);
+            rootCommand.Add(addCommand);
+            rootCommand.Add(removeCommand);
             rootCommand.Add(configCommand);
 
             return rootCommand.Invoke(args);
@@ -43,30 +63,32 @@ namespace Ctyar.Ef.Contrib
 
         private static void Recreate()
         {
-            var recreateCommand = new RecreateCommand();
-
-            recreateCommand.Execute();
+            new RecreateCommand().Execute();
         }
 
         private static void Squash()
         {
-            var squashCommand = new SquashCommand();
+            new SquashCommand().Execute();
+        }
 
-            squashCommand.Execute();
+        private static void Add(string migrationName)
+        {
+            new AddCommand().Execute(migrationName);
+        }
+
+        private static void Remove()
+        {
+            new RemoveCommand().Execute();
         }
 
         private static void Config()
         {
-            var configCommand = new ConfigCommand();
-
-            configCommand.Execute();
+            new ConfigCommand().Execute();
         }
 
         private static void Ef(string[] arguments)
         {
-            var efCommand = new EfCommand();
-
-            efCommand.Execute(arguments);
+            new EfCommand().Execute(arguments);
         }
     }
 }

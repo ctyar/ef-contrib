@@ -5,17 +5,10 @@ using System.IO;
 
 namespace Ctyar.Ef.Contrib
 {
-    internal class SquashCommand
+    internal class SquashCommand : CommandBase
     {
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        private Config _config;
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
         public void Execute()
         {
-            var configCommand = new ConfigCommand();
-            _config = configCommand.ReadConfigFile();
-
             var migrations = GetMigrations();
 
             var lastMigration = migrations[^1];
@@ -46,21 +39,21 @@ namespace Ctyar.Ef.Contrib
         {
             Print.Info("Removing last migration");
 
-            Execute("ef migrations remove");
+            StartProcess("ef migrations remove");
         }
 
         private void AddMigration(string migrationName)
         {
             Print.Info($"Adding new migration: {migrationName}");
 
-            Execute($"ef migrations add {migrationName}");
+            StartProcess($"ef migrations add {migrationName}");
         }
 
         private void UpdateDatabase(string migrationName)
         {
             Print.Info($"Updating database to : {migrationName}");
 
-            Execute(
+            StartProcess(
                 $"ef database update {migrationName}");
         }
 
@@ -68,7 +61,7 @@ namespace Ctyar.Ef.Contrib
         {
             Print.Info("Getting migrations list");
 
-            var lines = GetCommandResult("ef migrations list");
+            var lines = GetProcessResult("ef migrations list");
             
             // Skip first two lines:
             // Build started...
@@ -76,14 +69,16 @@ namespace Ctyar.Ef.Contrib
             return lines.ToArray()[2..];
         }
 
-        private void Execute(string command)
+        private void StartProcess(string command)
         {
+            var finalCommand = command + Config;
+
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    Arguments = command + _config.ToString(),
+                    Arguments = finalCommand,
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
                     WorkingDirectory = Directory.GetCurrentDirectory()
@@ -101,14 +96,16 @@ namespace Ctyar.Ef.Contrib
             }
         }
 
-        private List<string> GetCommandResult(string command)
+        private List<string> GetProcessResult(string command)
         {
+            var finalCommand = command + Config;
+
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    Arguments = command + _config.ToString(),
+                    Arguments = finalCommand,
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
                     WorkingDirectory = Directory.GetCurrentDirectory()

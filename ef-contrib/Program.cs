@@ -23,6 +23,13 @@ namespace Ctyar.Ef.Contrib
             };
             configCommand.AddAlias("-c");
 
+            if (args[0].ToLower() == "ef")
+            {
+                Ef(args);
+
+                return 0;
+            }
+
             rootCommand.Add(squashCommand);
             rootCommand.Add(configCommand);
 
@@ -41,6 +48,13 @@ namespace Ctyar.Ef.Contrib
             var configCommand = new ConfigCommand();
 
             configCommand.Execute();
+        }
+
+        private static void Ef(string[] arguments)
+        {
+            var efCommand = new EfCommand();
+
+            efCommand.Execute(arguments);
         }
     }
 }

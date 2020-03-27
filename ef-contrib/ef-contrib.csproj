@@ -10,7 +10,8 @@
 
   <PropertyGroup>
     <PackAsTool>true</PackAsTool>
-    <PackageId>ef-contrib</PackageId>
+    <ToolCommandName>ef-contrib</ToolCommandName>
+    <PackageId>ctyar.ef-contrib</PackageId>
     <PackageTags>entity-framework-core;EF;EntityFrameworkCore;EFCore</PackageTags>
     <Title>ef-contrib</Title>
     <Description>Entity Framework Core Contrib Tools for the .NET Command-Line Interface.

@@ -1,7 +1,9 @@
+$packageName = "ctyar.ef-contrib"
+
 dotnet-cake
 
-$version = (get-item .\artifacts\*.nupkg).Name -replace "ef-contrib.","" -replace ".nupkg",""
+$version = (get-item .\artifacts\*.nupkg).Name -replace "$($packageName).","" -replace ".nupkg",""
 
-dotnet tool uninstall ef-contrib --global
+dotnet tool uninstall $packageName --global
 
-dotnet tool install --global --add-source .\artifacts ef-contrib --version $version
+dotnet tool install --global --add-source .\artifacts $packageName --version $version

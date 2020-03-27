@@ -1,5 +1,7 @@
 # ef-contrib
 
+[![Build Status](https://dev.azure.com/ctyar/ef-contrib/_apis/build/status/ctyar.ef-contrib?branchName=master)](https://dev.azure.com/ctyar/ef-contrib/_build/latest?definitionId=3&branchName=master)
+
 A simple tool that helps with common scenarios while using Entity Framework Core command-line tool (dotnet-ef). `ef-contrib` is designed to keep the database and migrations in sync.
 For example, when you add or remove a new migration you don't need to manually update the database.
 

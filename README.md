@@ -1,6 +1,7 @@
 # ef-contrib
 
-A simple Ping like tool to check the common network connection issues in Iran. `pingct` is designed to constantly check the network connection and in case of any issue run a set of tests to facilitate troubleshooting.
+A simple tool that facilitates the common scenarios with Entity Framework Core. `ef-contrib` is designed to keep the database in sync with your migrations.
+For example, when you add or remove a new migration you don't need to manually update the database.
 
 ## Get started
 
@@ -9,7 +10,7 @@ Download the [.NET Core SDK](https://get.dot.net/).
 Once installed, run this command:
 
 ```
-$ dotnet tool install --global ef-contirb
+$ dotnet tool install --global ctyar.ef-contirb
 ```
 
 And run the tool with:

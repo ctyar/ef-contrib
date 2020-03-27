@@ -1,7 +1,18 @@
 # ef-contrib
 
-A simple tool that facilitates the common scenarios with Entity Framework Core. `ef-contrib` is designed to keep the database in sync with your migrations.
+A simple tool that helps with common scenarios while using Entity Framework Core command-line tool (dotnet-ef). `ef-contrib` is designed to keep the database and migrations in sync.
 For example, when you add or remove a new migration you don't need to manually update the database.
+
+__Sample scenario:__
+
+With `dotnet-ef` if you want to recreate the current migration that you are working on you have to follow these steps:
+
+1. Update the database to previous migration
+2. Remove the current migration
+3. Recreate the current migration
+4. Update the database
+
+But with `ef-contrib`, you just run `ef-contrib recreate` and everything is taken care of.
 
 ## Get started
 No release yet but soon :)

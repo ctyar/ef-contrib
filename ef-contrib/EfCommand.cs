@@ -8,7 +8,7 @@ namespace Ctyar.Ef.Contrib
     {
         public void Execute(string[] arguments)
         {
-            var command = string.Join(" ", arguments) + Config;
+            var command = "ef " + string.Join(" ", arguments) + Config;
 
             using var process = new Process
             {

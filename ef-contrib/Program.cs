@@ -7,13 +7,6 @@ namespace Ctyar.Ef.Contrib
     {
         public static int Main(string[] args)
         {
-            if (args.Length > 1 && args[0].ToLower() == "ef")
-            {
-                Ef(args);
-
-                return 0;
-            }
-
             var rootCommand = new RootCommand();
 
             var recreateCommand = new Command("recreate")
@@ -33,18 +26,30 @@ namespace Ctyar.Ef.Contrib
                 Handler = CommandHandler.Create<string>(Add),
                 Description = "Adds a new migration"
             };
-            var argument = new Argument("migrationName")
+            // Keep this name and type in sync with Add method's argument
+            var addArgument = new Argument<string>("migrationName")
             {
-                Arity = ArgumentArity.ExactlyOne,
                 Description = "Migration name to add"
             };
-            addCommand.AddArgument(argument);
+            addCommand.AddArgument(addArgument);
 
             var removeCommand = new Command("remove")
             {
                 Handler = CommandHandler.Create(Remove),
                 Description = "Removes the last migration"
             };
+
+            var efCommand = new Command("ef")
+            {
+                Handler = CommandHandler.Create<string[]>(Ef),
+                Description = "Call ef command directly with your specified configs"
+            };
+            // Keep this name and type in sync with Add method's argument
+            var efArgument = new Argument<string[]>("arguments")
+            {
+                Description = "Arguments"
+            };
+            efCommand.AddArgument(efArgument);
 
             var configCommand = new Command("config")
             {
@@ -56,6 +61,7 @@ namespace Ctyar.Ef.Contrib
             rootCommand.Add(squashCommand);
             rootCommand.Add(addCommand);
             rootCommand.Add(removeCommand);
+            rootCommand.Add(efCommand);
             rootCommand.Add(configCommand);
 
             return rootCommand.Invoke(args);

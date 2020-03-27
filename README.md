@@ -37,6 +37,9 @@ Commands:
   config                 Adds a config file with default project info
 ```
 
+## Pre-release builds
+Get the package from [here](https://github.com/ctyar/ef-contrib/packages/164132).
+
 ## Build
 Install [.NET Core SDK](https://get.dot.net/).
 

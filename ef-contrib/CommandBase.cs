@@ -133,6 +133,7 @@ namespace Ctyar.Ef.Contrib
         private string CleanName(string migrationName)
         {
             var index = migrationName.IndexOf('_');
+
             return migrationName.Substring(index + 1);
         }
     }

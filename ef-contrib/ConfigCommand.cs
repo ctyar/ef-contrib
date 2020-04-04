@@ -30,7 +30,7 @@ namespace Ctyar.Ef.Contrib
             {
                 config = JsonSerializer.Deserialize<Config>(File.ReadAllText(GetConfigFilePath()));
             }
-            catch
+            catch(Exception e) when(e is FileNotFoundException || e is JsonException)
             {
             }
 

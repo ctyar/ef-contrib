@@ -16,11 +16,11 @@
     <Title>ef-contrib</Title>
     <Description>A simple tool that helps with common scenarios while using Entity Framework Core command-line tool (dotnet-ef)
 Enables these commonly used commands:
+
 dotnet ef-contrib recreate
 dotnet ef-contrib squash
 dotnet ef-contrib add
-dotnet ef-contrib remove
-dotnet ef-contrib config</Description>
+dotnet ef-contrib remove</Description>
     <Authors>Shahriyar Qulami</Authors>
     <PackageProjectUrl>https://github.com/ctyar/ef-contrib</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ctyar/ef-contrib</RepositoryUrl>

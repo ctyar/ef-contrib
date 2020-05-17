@@ -3,19 +3,7 @@
 [![Build Status](https://dev.azure.com/ctyar/ef-contrib/_apis/build/status/ctyar.ef-contrib?branchName=master)](https://dev.azure.com/ctyar/ef-contrib/_build/latest?definitionId=3&branchName=master)
 [![ctyar.ef-contrib](https://img.shields.io/nuget/v/ctyar.ef-contrib.svg)](https://www.nuget.org/packages/ctyar.ef-contrib/)
 
-A simple tool that helps with common scenarios while using Entity Framework Core command-line tool (dotnet-ef). `ef-contrib` is designed to keep the database and migrations in sync.
-For example, when you add or remove a new migration you don't need to manually update the database.
-
-__Sample scenario:__
-
-With `dotnet-ef` if you want to recreate the current migration that you are working on you have to follow these steps:
-
-1. Update the database to previous migration
-2. Remove the current migration
-3. Recreate the current migration
-4. Update the database
-
-But with `ef-contrib`, you just run `ef-contrib recreate` and everything is taken care of.
+A simple tool that helps with common scenarios while using Entity Framework Core command-line tool (dotnet-ef). `ef-contrib` is designed to make everyday job easier.
 
 ## Get started
 
@@ -32,22 +20,81 @@ And run the tool with:
 $ ef-contrib
 ```
 
-## Usage
+### recreate
+
+With `dotnet-ef`, if you want to recreate the current migration that you are working on you have to execute multiple commands
+to first revert the current changes and then create a fresh migration. With `ef-contrib`, you can do this in a single command.
 
 ```
-  ef-contrib [options] [command]
+ef-contrib recreate
+```
 
-Options:
-  --version         Show version information
-  -?, -h, --help    Show help and usage information
+instead of
 
-Commands:
-  recreate               Recreates the last migration
-  squash                 Merges last two migrations
-  add <migrationName>    Adds a new migration
-  remove                 Removes the last migration
-  ef <arguments>         Call ef command directly with your specified configs
-  config                 Adds a config file with default project info
+```
+// Revert the changes from current migration
+dotnet ef database update MyPreviousMigration
+dotnet ef migrations remove
+
+// Create a fresh migration
+dotnet ef migrations add MyNewMigration
+dotnet ef database update
+```
+
+### squash
+
+With `dotnet-ef`, if you want to merge two migrations into one
+you have to first remove them and then recreate them again as one.
+
+```
+ef-contrib squash
+```
+
+instead of
+
+```
+// Remove the last two migrations
+dotnet ef database update MyMigrationBeforeAnyOfThese
+dotnet ef migrations remove
+dotnet ef migrations remove
+
+// Add the migration again
+dotnet ef migrations add MyNewMigration
+dotnet ef database update
+```
+
+### add/remove
+
+Adding and removing migrations also comes with another step to keep the database in sync.
+`ef-contrib` handles this part automatically.
+
+```
+ef-contrib add
+```
+
+instead of
+
+```
+dotnet ef migrations add MyNewMigration
+dotnet ef database update
+```
+
+### config
+
+If you happen to have multiple DbContexts or your DbContext is in a different project you have to add a lot of arguments every time you execute a command.
+With `ef-contrib config`, you can save all these configs in your project, and `efcotrib ef` takes care of adding those arguments to your calls.
+
+```
+// Just once to config
+ef-contrib config
+
+ef-contrib ef migrations list
+```
+
+instead of
+
+```
+dotnet ef migrations list --project MyCompany.Product.EfProject --startup-project MyCompany.Product.MainProject
 ```
 
 ## Pre-release builds
